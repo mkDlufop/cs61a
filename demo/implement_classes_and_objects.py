@@ -1,17 +1,3 @@
-"""
-from datetime import date
-from unicodedata import lookup
-
-tues = date(2023, 6, 11)
-
-print(tues - date(2023, 6, 10))
-
-print(tues.year)
-
-suits = ['heart', 'diamond', 'spade', 'club']
-print([lookup('WHITE ' + s.upper() + ' SUIT') for s in suits])
-print([lookup('BLACK ' + s.upper() + ' SUIT') for s in suits])
-"""
 
 def make_instance(cls):
     def get_value(name):
@@ -21,7 +7,7 @@ def make_instance(cls):
             value = cls['get'](name)
             return bind_method(value, instance)
     def set_value(name, value):
-        attibutes[name] = value
+        attributes[name] = value
     attributes = {}
     instance = {'get': get_value, 'set': set_value}
     return instance
@@ -53,4 +39,32 @@ def init_instance(cls, *args):
     if init:
         init(instance, *args)
     return instance
+
+def make_account_class():
+    interest = 0.02
+    def __init__(self, account_holder):
+        self['set']('holder', account_holder)
+        self['set']('balance', 0)
+    def deposit(self, amount):
+        new_balance = self['get']('balance') + amount
+        self['set']('balance', new_balance)
+        return self['get']('balance')
+    def withdraw(self, amount):
+        balance = self['get']('balance')
+        if amount > balance:
+            return 'Insufficient fund'
+        self['set']('balance', balance - amount)
+        return self['get']('balance')
+    return make_class(locals())
+
+Account = make_account_class()
+kirk_account = Account['new']('Kirk')
+print(kirk_account['get']('holder'))
+print(kirk_account['get']('interest'))
+print(kirk_account['get']('deposit')(20))
+print(kirk_account['get']('withdraw')(5))
+kirk_account['set']('interest', 0.04)
+print(Account['get']('interest'))
+
+print(repr(kirk_account))
 
